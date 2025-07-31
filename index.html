@@ -1,0 +1,256 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+  <title>Neon Flip Clock</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      background: black;
+      overflow: hidden;
+      font-family: 'Orbitron', sans-serif;
+      color: #ff0;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    @font-face {
+      font-family: 'Digital';
+      src: url('https://fonts.cdnfonts.com/s/7526/Digital7-rg1.ttf') format('truetype');
+    }
+
+    .clock {
+      font-size: 20vw;
+      font-family: 'Digital';
+      color: #ff0;
+      text-shadow: 0 0 10px #ff0, 0 0 30px #ff0;
+      letter-spacing: 0.1em;
+      display: flex;
+      align-items: center;
+    }
+
+    .colon {
+      opacity: 1;
+      transition: opacity 0.2s;
+    }
+
+    .alarm-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .alarm-btn img {
+      width: 40px;
+      height: 40px;
+      filter: brightness(1.2) drop-shadow(0 0 5px yellow);
+    }
+
+    .alarm-list {
+      position: fixed;
+      bottom: 70px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      color: yellow;
+      padding: 10px;
+      border-radius: 8px;
+      display: none;
+      max-height: 60vh;
+      overflow-y: auto;
+      z-index: 10;
+      min-width: 220px;
+    }
+
+    .alarm-list input[type="time"] {
+      background: black;
+      color: yellow;
+      border: 1px solid yellow;
+      padding: 4px 6px;
+      font-size: 16px;
+    }
+
+    .alarm-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+
+    .alarm-item input[type="checkbox"] {
+      margin-left: 10px;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .alarm-item button {
+      background: none;
+      border: none;
+      color: yellow;
+      margin-left: 5px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    #offBtn {
+      display: none;
+      position: fixed;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30vw;
+      max-width: 200px;
+      background: #ff0;
+      color: black;
+      font-size: 1.5rem;
+      font-weight: bold;
+      padding: 10px 0;
+      cursor: pointer;
+      text-align: center;
+      user-select: none;
+      z-index: 20;
+      box-shadow: 0 0 15px #ff0;
+      border-radius: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="clock" id="clock">
+    <span id="hours">00</span>
+    <span class="colon" id="colon">:</span>
+    <span id="minutes">00</span>
+  </div>
+
+  <button id="offBtn" onclick="stopAlarm()">OFF</button>
+
+  <button class="alarm-btn" onclick="toggleAlarmList()">
+    <img src="https://img.icons8.com/ios/50/ffff00/alarm-clock--v1.png" alt="Alarm">
+  </button>
+
+  <div class="alarm-list" id="alarmList">
+    <div style="margin-bottom:8px;">
+      <input type="time" id="newAlarmTime" />
+      <button onclick="addAlarm()">Add</button>
+    </div>
+    <div id="alarms"></div>
+  </div>
+
+  <audio id="alarmSound" src="https://actions.google.com/sounds/v1/alarms/medium_bell_ringing_near.ogg" loop></audio>
+
+  <script>
+    let alarms = [];
+    let alarmPlaying = false;
+    let alarmTimeoutId = null;
+    let colonVisible = true;
+
+    function updateClock() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+
+      document.getElementById('hours').textContent = h;
+      document.getElementById('minutes').textContent = m;
+
+      // چشمک‌زن کردن دو نقطه
+      colonVisible = !colonVisible;
+      document.getElementById('colon').style.opacity = colonVisible ? 1 : 0;
+
+      const currentTime = `${h}:${m}`;
+      alarms.forEach((alarm, index) => {
+        if (alarm.enabled && alarm.time === currentTime && !alarm.triggered) {
+          playAlarm();
+          alarm.triggered = true;
+          showOffButton(true);
+        }
+        if (alarm.time !== currentTime) {
+          alarm.triggered = false;
+        }
+      });
+    }
+
+    function playAlarm() {
+      if (alarmPlaying) return;
+      const sound = document.getElementById('alarmSound');
+      sound.currentTime = 0;
+      sound.play();
+      alarmPlaying = true;
+      alarmTimeoutId = setTimeout(stopAlarm, 60000);
+    }
+
+    function stopAlarm() {
+      if (!alarmPlaying) return;
+      const sound = document.getElementById('alarmSound');
+      sound.pause();
+      sound.currentTime = 0;
+      alarmPlaying = false;
+      clearTimeout(alarmTimeoutId);
+      showOffButton(false);
+    }
+
+    function showOffButton(show) {
+      document.getElementById('offBtn').style.display = show ? 'block' : 'none';
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function toggleAlarmList() {
+      const list = document.getElementById('alarmList');
+      list.style.display = list.style.display === 'none' || list.style.display === '' ? 'block' : 'none';
+    }
+
+    function addAlarm() {
+      const time = document.getElementById('newAlarmTime').value;
+      if (time && !alarms.find(a => a.time === time)) {
+        alarms.push({ time, enabled: true, triggered: false });
+        renderAlarms();
+        document.getElementById('newAlarmTime').value = '';
+      }
+    }
+
+    function renderAlarms() {
+      const container = document.getElementById('alarms');
+      container.innerHTML = '';
+      alarms.forEach((alarm, index) => {
+        const div = document.createElement('div');
+        div.className = 'alarm-item';
+        div.innerHTML = `
+          <input type="time" value="${alarm.time}" onchange="editAlarm(${index}, this.value)" />
+          <input type="checkbox" ${alarm.enabled ? 'checked' : ''} onchange="toggleAlarm(${index})" />
+          <button onclick="deleteAlarm(${index})">❌</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function deleteAlarm(i) {
+      if (alarms[i].triggered) stopAlarm();
+      alarms.splice(i, 1);
+      renderAlarms();
+    }
+
+    function toggleAlarm(i) {
+      alarms[i].enabled = !alarms[i].enabled;
+      if (!alarms[i].enabled && alarms[i].triggered) stopAlarm();
+    }
+
+    function editAlarm(i, newTime) {
+      alarms[i].time = newTime;
+      alarms[i].triggered = false;
+      stopAlarm();
+      renderAlarms();
+    }
+  </script>
+</body>
+</html>
