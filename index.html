@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>راهنمای استفاده از رمزگذار متن</title>
+  <style>
+    /* پس زمینه سرمه‌ای */
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #2c3e50, #34495e);
+      font-family: 'Tahoma', 'Vazir', sans-serif;
+      direction: rtl;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #ecf0f1;
+    }
+
+    /* کارت شیشه‌ای مات */
+    .glass-container {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      padding: 25px 30px;
+      max-width: 600px;
+      width: 100%;
+      box-sizing: border-box;
+      line-height: 1.6;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    h2 {
+      margin-top: 20px;
+      margin-bottom: 10px;
+      font-weight: 600;
+      color: #d0d7de;
+    }
+
+    p {
+      margin-bottom: 15px;
+      font-size: 1.05rem;
+      color: #ecf0f1;
+    }
+
+    ul {
+      padding-left: 20px;
+      margin-bottom: 20px;
+      color: #ecf0f1;
+    }
+
+    ul li {
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+
+    a.button {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 12px 30px;
+      background: #ecf0f1;
+      color: #2c3e50;
+      border-radius: 15px;
+      text-decoration: none;
+      font-weight: 700;
+      box-shadow: 0 4px 10px rgba(236, 240, 241, 0.6);
+      transition: background-color 0.3s ease, color 0.3s ease;
+      user-select: none;
+    }
+
+    a.button:hover {
+      background: #d0d7de;
+    }
+  </style>
+</head>
+<body>
+  <div class="glass-container">
+    <h1>راهنمای استفاده از برنامه رمزگذاری متن</h1>
+
+    <h2>رمزگذاری متن</h2>
+    <p>
+      ۱. متن دلخواه خود را در قسمت <strong>متن ورودی</strong> وارد کنید.<br />
+      ۲. یک کلید رمز (رمز عبور) دلخواه وارد کنید.<br />
+      ۳. روی دکمه <strong>رمزگذاری</strong> کلیک کنید.<br />
+      ۴. نتیجه رمزگذاری شده در قسمت <strong>نتیجه</strong> نمایش داده می‌شود که می‌توانید آن را ذخیره یا منتقل کنید.
+    </p>
+
+    <h2>رمزگشایی متن</h2>
+    <p>
+      ۱. متن رمزگذاری شده (حروف به هم ریخته) را در قسمت <strong>متن ورودی</strong> قرار دهید.<br />
+      ۲. کلید رمز استفاده شده در هنگام رمزگذاری را وارد کنید.<br />
+      ۳. روی دکمه <strong>رمزگشایی</strong> کلیک کنید.<br />
+      ۴. متن اصلی در قسمت <strong>نتیجه</strong> نمایش داده می‌شود.
+    </p>
+
+    <h2>نکات مهم</h2>
+    <ul>
+      <li>کلید رمز باید دقیقاً همان کلیدی باشد که در رمزگذاری استفاده شده است.</li>
+      <li>برنامه از حروف فارسی، انگلیسی و نشانه‌ها به خوبی پشتیبانی می‌کند.</li>
+    </ul>
+
+    <a href="pass.html" class="button">رفتن به صفحه رمزگذاری</a>
+  </div>
+</body>
+</html>

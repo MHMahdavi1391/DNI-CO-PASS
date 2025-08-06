@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>رمزگذاری و رمزگشایی متن (UTF-8 safe)</title>
+  <style>
+    /* همان استایل قبلی با glassmorphism */
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #2c3e50, #34495e);
+      font-family: 'Tahoma', 'Vazir', sans-serif;
+      direction: rtl;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #ecf0f1;
+    }
+    .glass-container {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      padding: 25px 30px;
+      max-width: 500px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    h2 { text-align: center; margin-bottom: 25px; font-weight: 700; letter-spacing: 1px; }
+    label { display: block; margin-bottom: 6px; font-weight: 600; }
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 12px 15px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      resize: vertical;
+      font-family: 'Tahoma', 'Vazir', sans-serif;
+      box-sizing: border-box;
+      background: rgba(255,255,255,0.15);
+      color: #ecf0f1;
+      outline: none;
+      transition: background 0.3s ease;
+    }
+    textarea::placeholder, input::placeholder { color: #bdc3c7; }
+    textarea:focus, input:focus { background: rgba(255,255,255,0.25); }
+    button {
+      width: 48%;
+      padding: 12px 0;
+      margin: 0 1% 15px 1%;
+      border: none;
+      border-radius: 15px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: #2c3e50;
+      background: #ecf0f1;
+      box-shadow: 0 4px 10px rgba(236, 240, 241, 0.6);
+      transition: background 0.3s ease, color 0.3s ease;
+      user-select: none;
+    }
+    button:hover { background: #d0d7de; }
+    #result {
+      background: rgba(255,255,255,0.15);
+      border-radius: 15px;
+      padding: 15px;
+      min-height: 80px;
+      white-space: pre-wrap;
+      font-size: 1rem;
+      box-sizing: border-box;
+      user-select: text;
+      color: #ecf0f1;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    @media (max-width: 480px) {
+      button { width: 100%; margin: 0 0 15px 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="glass-container">
+    <h2>رمزگذاری و رمزگشایی متن (UTF-8 safe)</h2>
+
+    <label for="inputText">متن ورودی:</label>
+    <textarea id="inputText" placeholder="متن را اینجا وارد کنید..."></textarea>
+
+    <label for="key">کلید رمز:</label>
+    <input type="text" id="key" placeholder="رمز را وارد کنید..." autocomplete="off" />
+
+    <button onclick="encryptText()">رمزگذاری</button>
+    <button onclick="decryptText()">رمزگشایی</button>
+
+    <h3>نتیجه:</h3>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    // تبدیل رشته به آرایه بایت UTF-8
+    function utf8Encode(str) {
+      return new TextEncoder().encode(str);
+    }
+
+    // تبدیل آرایه بایت UTF-8 به رشته
+    function utf8Decode(bytes) {
+      return new TextDecoder().decode(bytes);
+    }
+
+    // عملیات XOR روی دو آرایه بایت
+    function xorBytes(data, key) {
+      let output = new Uint8Array(data.length);
+      for (let i = 0; i < data.length; i++) {
+        output[i] = data[i] ^ key[i % key.length];
+      }
+      return output;
+    }
+
+    function encryptText() {
+      const text = document.getElementById('inputText').value;
+      const key = document.getElementById('key').value;
+      if (!text.trim() || !key.trim()) {
+        alert('لطفاً متن و کلید رمز را وارد کنید.');
+        return;
+      }
+
+      const textBytes = utf8Encode(text);
+      const keyBytes = utf8Encode(key);
+      const encryptedBytes = xorBytes(textBytes, keyBytes);
+      const base64 = btoa(String.fromCharCode(...encryptedBytes));
+      document.getElementById('result').textContent = base64;
+    }
+
+    function decryptText() {
+      const base64 = document.getElementById('result').textContent;
+      const key = document.getElementById('key').value;
+      if (!base64.trim() || !key.trim()) {
+        alert('لطفاً کلید رمز را وارد کنید و ابتدا رمزگذاری انجام شود.');
+        return;
+      }
+
+      try {
+        const encryptedStr = atob(base64);
+        const encryptedBytes = Uint8Array.from(encryptedStr, c => c.charCodeAt(0));
+        const keyBytes = utf8Encode(key);
+        const decryptedBytes = xorBytes(encryptedBytes, keyBytes);
+        const decryptedText = utf8Decode(decryptedBytes);
+        document.getElementById('result').textContent = decryptedText;
+      } catch (e) {
+        alert('رشته ورودی معتبر نیست یا کلید اشتباه است.');
+      }
+    }
+  </script>
+</body>
+</html>
